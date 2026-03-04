@@ -32,4 +32,16 @@ class ActivityLog extends Model
     {
         return $this->morphTo();
     }
+
+    public static function log(string $type, string $description, ?Model $subject = null, array $properties = []): self
+    {
+        return self::create([
+            'user_id' => auth()->id(),
+            'type' => $type,
+            'description' => $description,
+            'subject_type' => $subject?->getMorphClass(),
+            'subject_id' => $subject?->getKey(),
+            'properties' => $properties,
+        ]);
+    }
 }

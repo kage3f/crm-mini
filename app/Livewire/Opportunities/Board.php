@@ -40,7 +40,7 @@ class Board extends Component
     public function move(int $opportunityId, int $stageId, MoveOpportunityAction $action): void
     {
         $opportunity = Opportunity::findOrFail($opportunityId);
-        $this->authorize('move', $opportunity);
+        $this->authorize('update', $opportunity);
         $action->execute($opportunity, $stageId);
     }
 

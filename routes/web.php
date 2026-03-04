@@ -10,8 +10,6 @@ use App\Livewire\Clients\Index as ClientsIndex;
 use App\Livewire\Clients\Show as ClientShow;
 use App\Livewire\Opportunities\Board as KanbanBoard;
 use App\Livewire\Tasks\Index as TasksIndex;
-use App\Livewire\Billing\Plans;
-use App\Livewire\Billing\Checkout;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\Security;
 use App\Livewire\Settings\Company;
@@ -89,11 +87,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Tasks
     Route::get('/tasks', TasksIndex::class)->name('tasks.index');
 
-    // Billing
-    Route::get('/billing/plans', Plans::class)->name('billing.plans');
-    Route::get('/billing/checkout/{plan}', Checkout::class)->name('billing.checkout');
-    Route::post('/billing/simulate/{plan}', [\App\Http\Controllers\BillingController::class, 'simulate'])
-        ->name('billing.simulate');
 
     // Settings
     Route::prefix('settings')->name('settings.')->group(function () {

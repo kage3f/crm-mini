@@ -140,7 +140,6 @@
     {{-- Drag & Drop Script --}}
     @script
     <script>
-        // Inicializa direto — sem esperar evento nenhum
         function initSortable() {
             document.querySelectorAll('.kanban-list').forEach(el => {
                 if (el._sortable) el._sortable.destroy(); // evita duplicar ao re-render
@@ -164,7 +163,6 @@
 
         initSortable();
 
-        // Reinicializa após cada re-render do Livewire
         $wire.on('kanban-refreshed', initSortable);
     </script>
     @endscript

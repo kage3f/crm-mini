@@ -4,8 +4,6 @@ namespace App\Actions\Auth;
 
 use App\Models\Company;
 use App\Models\OpportunityStage;
-use App\Models\Plan;
-use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -36,13 +34,6 @@ class RegisterCompanyAction
             // 4. Seed default stages for this company
             $this->seedDefaultStages($company);
 
-            // 5. Subscribe to free plan
-            $freePlan = Plan::where('slug', 'free')->firstOrFail();
-            Subscription::create([
-                'company_id' => $company->id,
-                'plan_id'    => $freePlan->id,
-                'status'     => 'active',
-            ]);
 
             return $user;
         });

@@ -4,7 +4,6 @@ namespace App\Livewire\Clients;
 
 use App\Actions\Clients\CreateClientAction;
 use App\Actions\Clients\UpdateClientAction;
-use App\Models\Subscription;
 use App\Models\Client;
 use Livewire\Component;
 use Livewire\WithPagination;
