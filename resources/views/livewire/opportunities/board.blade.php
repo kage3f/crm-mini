@@ -140,26 +140,32 @@
     {{-- Drag & Drop Script --}}
     @script
     <script>
-        $wire.on('DOMContentLoaded', () => {
-            const lists = document.querySelectorAll('.kanban-list');
-            lists.forEach(el => {
-                new Sortable(el, {
+        // Inicializa direto — sem esperar evento nenhum
+        function initSortable() {
+            document.querySelectorAll('.kanban-list').forEach(el => {
+                if (el._sortable) el._sortable.destroy(); // evita duplicar ao re-render
+
+                el._sortable = new Sortable(el, {
                     group: 'kanban',
                     animation: 150,
                     ghostClass: 'sortable-ghost',
                     chosenClass: 'sortable-chosen',
-                    dragClass: "sortable-drag",
-                    onEnd: function(evt) {
-                        const opportunityId = evt.item.getAttribute('data-id');
-                        const toStageId = evt.to.getAttribute('data-stage');
-
-                        if (evt.from !== evt.to) {
-                            $wire.move(opportunityId, toStageId);
-                        }
+                    dragClass: 'sortable-drag',
+                    onEnd(evt) {
+                        if (evt.from === evt.to) return;
+                        $wire.move(
+                            evt.item.dataset.id,
+                            evt.to.dataset.stage
+                        );
                     }
                 });
             });
-        });
+        }
+
+        initSortable();
+
+        // Reinicializa após cada re-render do Livewire
+        $wire.on('kanban-refreshed', initSortable);
     </script>
     @endscript
 </div>
