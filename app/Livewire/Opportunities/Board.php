@@ -19,22 +19,32 @@ class Board extends Component
     public ?int $editingId = null;
 
     #[Rule('required|string|min:2|max:255')]
-    public string $title             = '';
+    public string $title = '';
 
     #[Rule('nullable|integer')]
-    public string $client_id         = '';
+    public string $client_id = '';
 
     #[Rule('required|integer')]
-    public string $stage_id          = '';
+    public string $stage_id = '';
 
     #[Rule('required|numeric|min:0')]
-    public string $value             = '0';
+    public string $value = '0';
 
     #[Rule('nullable|date')]
     public string $expected_close_date = '';
 
     #[Rule('nullable|string|max:5000')]
-    public string $notes             = '';
+    public string $notes = '';
+
+    public string $dateFrom = '';
+    public string $dateTo = '';
+
+
+    public function mount(): void
+    {
+        $this->dateFrom = now()->startOfMonth()->format('Y-m-d');
+        $this->dateTo = now()->endOfMonth()->format('Y-m-d');
+    }
 
 
     public function move(int $opportunityId, int $stageId, MoveOpportunityAction $action): void
@@ -119,20 +129,25 @@ class Board extends Component
                 'opportunities' => fn ($q) => $q
                     ->select(['id', 'title', 'client_id', 'stage_id', 'value', 'expected_close_date'])
                     ->with('client:id,name')
+                    ->when($this->dateFrom, fn ($q) =>
+                    $q->whereDate('expected_close_date', '>=', $this->dateFrom)
+                    )
+                    ->when($this->dateTo, fn ($q) =>
+                    $q->whereDate('expected_close_date', '<=', $this->dateTo)
+                    )
                     ->orderByDesc('value')
                     ->limit(100),
             ])
             ->get();
 
-        $clients = Client::orderBy('name')
-            ->limit(500)
-            ->get(['id', 'name']);
+        $clients = Client::orderBy('name')->limit(500)->get(['id', 'name']);
 
-        $closedStageNames = ['Fechado - Ganho', 'Fechado - Perdido'];
+        $closedIds = OpportunityStage::whereIn('name', ['Fechado - Ganho', 'Fechado - Perdido'])
+            ->pluck('id');
 
         $totalEstimated = $stages
             ->flatMap->opportunities
-            ->filter(fn ($opp) => ! in_array($opp->stage?->name, $closedStageNames, true))
+            ->filter(fn ($opp) => ! $closedIds->contains($opp->stage_id))
             ->sum('value');
 
         return view('livewire.opportunities.board', compact('stages', 'clients', 'totalEstimated'))
@@ -151,5 +166,17 @@ class Board extends Component
         $this->value               = '0';
         $this->editingId           = null;
         $this->resetErrorBag();
+    }
+
+    public function refresh(): void
+    {
+        $this->dispatch('kanban-refreshed');
+    }
+
+    public function clearFilters(): void
+    {
+        $this->dateFrom = '';
+        $this->dateTo   = '';
+        $this->dispatch('filters-cleared');
     }
 }

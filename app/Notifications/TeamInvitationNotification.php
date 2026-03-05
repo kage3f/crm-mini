@@ -2,7 +2,7 @@
 
 namespace App\Notifications;
 
-use App\Models\TenantInvitation;
+use App\Models\TeamInvitation;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -11,7 +11,7 @@ class TeamInvitationNotification extends Notification
 {
     use Queueable;
 
-    public function __construct(public TenantInvitation $invitation) {}
+    public function __construct(public TeamInvitation $invitation) {}
 
     public function via(object $notifiable): array
     {

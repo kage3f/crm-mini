@@ -48,13 +48,6 @@ class Index extends Component
         return ActivityLog::orderByDesc('created_at')->take(10)->get();
     }
 
-    public function getSubscriptionProperty()
-    {
-        return Subscription::where('company_id', auth()->user()->company_id)
-            ->with('plan')
-            ->first();
-    }
-
     public function getMonthlyChartDataProperty(): array
     {
         $data = [];
@@ -84,7 +77,6 @@ class Index extends Component
             'closedRevenueThisMonth' => $this->closedRevenueThisMonth,
             'overdueTasksCount'     => $this->overdueTasksCount,
             'recentActivity'        => $this->recentActivity,
-            'subscription'          => $this->subscription,
             'chartData'             => $this->monthlyChartData,
         ])->layout('layouts.app', ['title' => 'Dashboard']);
     }

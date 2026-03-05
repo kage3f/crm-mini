@@ -8,15 +8,19 @@
     <h2 class="text-2xl font-bold text-slate-900 mb-2">Confirme seu email</h2>
     <p class="text-slate-500 text-sm mb-6">
         Enviamos um link de verificação para <strong>{{ auth()->user()->email }}</strong>.<br>
-        Por favor, verifique sua caixa de entrada.
+        Por favor, verifique sua caixa de entrada e spam.
     </p>
 
-    <form method="POST" action="{{ route('verification.send') }}">
-        @csrf
-        <button type="submit" class="btn-secondary w-full justify-center mb-3">
-            Reenviar email de verificação
-        </button>
-    </form>
+    @if (session('success'))
+        <div class="mb-4 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+            <p class="text-sm text-emerald-700">{{ session('success') }}</p>
+        </div>
+    @endif
+
+    <button wire:click="resendEmail" class="btn-secondary w-full justify-center mb-3" wire:loading.attr="disabled">
+        <span wire:loading.remove>Reenviar email de verificação</span>
+        <span wire:loading>Reenviando...</span>
+    </button>
 
     <form method="POST" action="{{ route('logout') }}">
         @csrf

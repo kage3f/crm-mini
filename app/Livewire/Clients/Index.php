@@ -50,13 +50,6 @@ class Index extends Component
 
     public function openCreateModal(): void
     {
-        // Check plan limit before allowing creation
-        $sub = Subscription::where('company_id', auth()->user()->company_id)->with('plan')->first();
-        if ($sub && $sub->plan->client_limit > 0 && Client::count() >= $sub->plan->client_limit) {
-            session()->flash('error', "Limite de {$sub->plan->client_limit} clientes atingido. Faça upgrade do plano.");
-            return;
-        }
-
         $this->resetForm();
         $this->isEditing = false;
         $this->showModal = true;

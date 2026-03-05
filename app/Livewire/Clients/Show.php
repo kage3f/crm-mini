@@ -11,13 +11,16 @@ class Show extends Component
 
     public function mount(Client $client)
     {
-        $this->client = $client->load(['opportunities.stage', 'tasks']);
+        $this->client = $client;
     }
 
     public function render()
     {
+        // Reload the client with relationships to ensure fresh data
+        $client = $this->client->load(['opportunities.stage', 'tasks']);
+
         return view('livewire.clients.show', [
-            'client' => $this->client,
-        ])->layout('layouts.app', ['title' => $this->client->name]);
+            'client' => $client,
+        ])->layout('layouts.app', ['title' => $client->name]);
     }
 }

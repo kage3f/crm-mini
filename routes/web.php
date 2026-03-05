@@ -79,7 +79,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Clients
     Route::get('/clients', ClientsIndex::class)->name('clients.index');
-    Route::get('/clients/{id}', ClientShow::class)->name('clients.show');
+    Route::get('/clients/{client}', ClientShow::class)->name('clients.show');
 
     // Opportunities (Kanban)
     Route::get('/opportunities', KanbanBoard::class)->name('opportunities.index');

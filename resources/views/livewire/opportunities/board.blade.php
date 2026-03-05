@@ -1,16 +1,62 @@
-<div class="h-full flex flex-col">
-    <div class="flex items-center justify-between mb-6 shrink-0">
+<div class="h-full flex flex-col overflow-x-clip">
+    <div class="flex items-center justify-between mb-6 shrink-0 flex-wrap gap-4" style="width: calc(100vw - 310px)">
         <div>
             <h3 class="text-sm text-slate-500 font-medium">Pipeline Comercial</h3>
-            <p class="text-xs text-slate-400 mt-0.5">Total previsto em aberto: <strong>R$ {{ number_format($totalEstimated, 2, ',', '.') }}</strong></p>
+            <p class="text-xs text-slate-400 mt-0.5">
+                Total previsto em aberto: <strong>R$ {{ number_format($totalEstimated, 2, ',', '.') }}</strong>
+            </p>
         </div>
-        <button wire:click="openCreateModal" class="btn-primary">
-            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Nova Oportunidade
-        </button>
+
+            <div class="flex items-center gap-2">
+                {{-- De --}}
+                <div class="flex flex-col bg-white border border-slate-200 rounded-lg px-3 py-1.5 shadow-xs cursor-pointer hover:border-slate-300 transition-colors min-w-[120px]">
+                    <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">De</span>
+                    <input id="picker-from" readonly placeholder="dd/mm/aaaa"
+                           class="text-xs text-slate-700 border-none outline-none bg-transparent cursor-pointer w-full" />
+                </div>
+
+                <svg class="w-3.5 h-3.5 text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+
+                {{-- Até --}}
+                <div class="flex flex-col bg-white border border-slate-200 rounded-lg px-3 py-1.5 shadow-xs cursor-pointer hover:border-slate-300 transition-colors min-w-[120px]">
+                    <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Até</span>
+                    <input id="picker-to" readonly placeholder="dd/mm/aaaa"
+                           class="text-xs text-slate-700 border-none outline-none bg-transparent cursor-pointer w-full" />
+                </div>
+
+                @if($dateFrom || $dateTo)
+                    <button wire:click="clearFilters" class="text-slate-300 hover:text-red-400 transition-colors" title="Limpar filtro">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                @endif
+            </div>
+
+            {{-- Botão refresh manual --}}
+            <button wire:click="refresh" wire:loading.attr="disabled"
+                    class="btn-secondary flex items-center gap-1.5">
+                <svg wire:loading.class="animate-spin" wire:target="refresh"
+                     class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span class="text-xs">Atualizar</span>
+            </button>
+
+            <button wire:click="openCreateModal" class="btn-primary">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Nova Oportunidade
+            </button>
     </div>
+
+    @if(!$showModal)
+        <div wire:poll.60s="refresh"></div>
+    @endif
 
     {{-- Kanban Board --}}
     <div class="flex-1 overflow-x-auto pb-6 -mx-6 px-6">
@@ -139,31 +185,70 @@
 
     {{-- Drag & Drop Script --}}
     @script
-    <script>
-        function initSortable() {
-            document.querySelectorAll('.kanban-list').forEach(el => {
-                if (el._sortable) el._sortable.destroy(); // evita duplicar ao re-render
+        <script>
+            function initSortable() {
+                document.querySelectorAll('.kanban-list').forEach(el => {
+                    if (el._sortable) el._sortable.destroy();
 
-                el._sortable = new Sortable(el, {
-                    group: 'kanban',
-                    animation: 150,
-                    ghostClass: 'sortable-ghost',
-                    chosenClass: 'sortable-chosen',
-                    dragClass: 'sortable-drag',
-                    onEnd(evt) {
-                        if (evt.from === evt.to) return;
-                        $wire.move(
-                            evt.item.dataset.id,
-                            evt.to.dataset.stage
-                        );
-                    }
+                    el._sortable = new Sortable(el, {
+                        group: 'kanban',
+                        animation: 150,
+                        ghostClass: 'sortable-ghost',
+                        chosenClass: 'sortable-chosen',
+                        dragClass: 'sortable-drag',
+                        onEnd(evt) {
+                            if (evt.from === evt.to) return;
+                            $wire.move(
+                                evt.item.dataset.id,
+                                evt.to.dataset.stage
+                            );
+                        }
+                    });
                 });
+            }
+
+            const fpConfig = {
+                locale: 'pt',
+                dateFormat: 'd/m/Y',
+                disableMobile: true,
+            };
+
+            // Converte string ISO para Date local (evita bug de fuso UTC)
+            function isoToLocal(iso) {
+                return iso ? new Date(iso + 'T00:00:00') : null;
+            }
+
+            // Converte Date para string ISO sem fuso
+            function dateToIso(date) {
+                const y = date.getFullYear();
+                const m = String(date.getMonth() + 1).padStart(2, '0');
+                const d = String(date.getDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+
+            const fpFrom = flatpickr('#picker-from', {
+                ...fpConfig,
+                defaultDate: isoToLocal($wire.dateFrom),
+                onChange([date]) {
+                    $wire.set('dateFrom', dateToIso(date));
+                },
             });
-        }
 
-        initSortable();
+            const fpTo = flatpickr('#picker-to', {
+                ...fpConfig,
+                defaultDate: isoToLocal($wire.dateTo),
+                onChange([date]) {
+                    $wire.set('dateTo', dateToIso(date));
+                },
+            });
 
-        $wire.on('kanban-refreshed', initSortable);
-    </script>
+            // Watch é mais confiável que evento para sincronizar limpeza
+            $wire.watch('dateFrom', value => { if (!value) fpFrom.clear(); });
+            $wire.watch('dateTo',   value => { if (!value) fpTo.clear(); });
+
+            initSortable();
+
+            $wire.on('kanban-refreshed', initSortable);
+        </script>
     @endscript
 </div>

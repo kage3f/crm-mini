@@ -95,19 +95,6 @@
             </div>
         </div>
     </div>
-
-    {{-- Plan warning --}}
-    @if($subscription && $subscription->plan?->isFree())
-    <div class="mt-5 card bg-gradient-to-r from-brand-600 to-purple-600 border-0 p-5 flex items-center justify-between">
-        <div>
-            <p class="text-white font-semibold">Você está no plano Gratuito</p>
-            <p class="text-brand-100 text-sm mt-0.5">Limite de 10 clientes. Faça upgrade para crescer sem limites.</p>
-        </div>
-        <a href="{{ route('billing.plans') }}" class="btn bg-white text-brand-700 hover:bg-brand-50 shrink-0">
-            Ver planos
-        </a>
-    </div>
-    @endif
 </div>
 
 @push('scripts')
