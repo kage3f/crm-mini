@@ -1,40 +1,43 @@
-<div class="h-full flex flex-col overflow-x-clip">
-    <div class="flex items-center justify-between mb-6 shrink-0 flex-wrap gap-4" style="width: calc(100vw - 310px)">
-        <div>
-            <h3 class="text-sm text-slate-500 font-medium">Pipeline Comercial</h3>
-            <p class="text-xs text-slate-400 mt-0.5">
-                Total previsto em aberto: <strong>R$ {{ number_format($totalEstimated, 2, ',', '.') }}</strong>
-            </p>
-        </div>
+<div class="min-h-full flex flex-col overflow-x-clip w-full min-w-0">
+    <div class="sticky top-0 left-0 right-0 z-20 w-full bg-slate-50/95 backdrop-blur border-b border-slate-100">
+        <div class="flex items-center justify-between pt-4 pb-4 px-6 shrink-0 flex-wrap gap-4">
+            <div>
+                <h3 class="text-sm text-slate-500 font-medium">Pipeline Comercial</h3>
+                <p class="text-xs text-slate-400 mt-0.5">
+                    Total previsto em aberto: <strong>R$ {{ number_format($totalEstimated, 2, ',', '.') }}</strong>
+                </p>
+            </div>
 
-        <div class="flex items-center gap-2">
-            <button wire:click="$toggle('showFilters')" class="btn-secondary flex items-center gap-1.5">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L14 13.414V19a1 1 0 01-1.447.894l-2-1A1 1 0 0110 18v-4.586L3.293 6.707A1 1 0 013 6V4z" />
-                </svg>
-                <span class="text-xs">Filtros</span>
-            </button>
-
-            {{-- Botão refresh manual --}}
-            <button wire:click="refresh" wire:loading.attr="disabled"
-                    class="btn-secondary flex items-center gap-1.5">
-                <svg wire:loading.class="animate-spin" wire:target="refresh"
-                     class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                <span class="text-xs">Atualizar</span>
-            </button>
-
-            @can('opportunities.create')
-                <button wire:click="openCreateModal" class="btn-primary">
+            <div class="flex items-center gap-2">
+                <button wire:click="$toggle('showFilters')" class="btn-secondary flex items-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L14 13.414V19a1 1 0 01-1.447.894l-2-1A1 1 0 0110 18v-4.586L3.293 6.707A1 1 0 013 6V4z" />
                     </svg>
-                    Nova Oportunidade
+                    <span class="text-xs">Filtros</span>
                 </button>
-            @endcan
+
+                {{-- Botão refresh manual --}}
+                <button wire:click="refresh" wire:loading.attr="disabled"
+                        class="btn-secondary flex items-center gap-1.5">
+                    <svg wire:loading.class="animate-spin" wire:target="refresh"
+                         class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span class="text-xs">Atualizar</span>
+                </button>
+
+                @can('opportunities.create')
+                    <button wire:click="openCreateModal" class="btn-primary">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Nova Oportunidade
+                    </button>
+                @endcan
+            </div>
         </div>
+
     </div>
 
     @if($showFilters)
@@ -118,7 +121,7 @@
     @endif
 
     {{-- Kanban Board --}}
-    <div class="flex-1 overflow-x-auto pb-6 -mx-6 px-6">
+    <div class="overflow-x-auto pb-6 -mx-6 px-6">
         <div class="flex gap-4 h-full min-h-[600px] items-start">
             @foreach($stages as $stage)
             <div class="kanban-col flex flex-col" data-stage-id="{{ $stage->id }}">
