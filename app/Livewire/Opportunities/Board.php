@@ -36,6 +36,14 @@ class Board extends Component
     #[Rule('nullable|string|max:5000')]
     public string $notes = '';
 
+    public bool $showFilters = false;
+    public string $search = '';
+    public string $clientFilter = '';
+    public string $stageFilter = '';
+    public string $statusFilter = '';
+    public string $valueMin = '';
+    public string $valueMax = '';
+
     public string $dateFrom = '';
     public string $dateTo = '';
 
@@ -133,16 +141,45 @@ class Board extends Component
         abort_unless(auth()->user()?->can('opportunities.view'), 403);
         $this->authorize('viewAny', Opportunity::class);
 
-        $stages = OpportunityStage::orderBy('order')
+        $closedIds = OpportunityStage::whereIn('name', ['Fechado - Ganho', 'Fechado - Perdido'])
+            ->pluck('id');
+
+        $allStages = OpportunityStage::orderBy('order')->get(['id', 'name', 'color']);
+
+        $stagesQuery = OpportunityStage::orderBy('order');
+
+        if (!blank($this->stageFilter)) {
+            $stagesQuery->where('id', $this->stageFilter);
+        }
+
+        $stages = $stagesQuery
             ->with([
                 'opportunities' => fn ($q) => $q
                     ->select(['id', 'title', 'client_id', 'stage_id', 'value', 'expected_close_date'])
                     ->with('client:id,name')
+                    ->when($this->search, fn ($q) =>
+                        $q->where('title', 'like', "%{$this->search}%")
+                    )
+                    ->when($this->clientFilter, fn ($q) =>
+                        $q->where('client_id', $this->clientFilter)
+                    )
+                    ->when($this->statusFilter === 'open', fn ($q) =>
+                        $q->whereNotIn('stage_id', $closedIds)
+                    )
+                    ->when($this->statusFilter === 'closed', fn ($q) =>
+                        $q->whereIn('stage_id', $closedIds)
+                    )
+                    ->when($this->valueMin !== '', fn ($q) =>
+                        $q->where('value', '>=', (float) $this->valueMin)
+                    )
+                    ->when($this->valueMax !== '', fn ($q) =>
+                        $q->where('value', '<=', (float) $this->valueMax)
+                    )
                     ->when($this->dateFrom, fn ($q) =>
-                    $q->whereDate('expected_close_date', '>=', $this->dateFrom)
+                        $q->whereDate('expected_close_date', '>=', $this->dateFrom)
                     )
                     ->when($this->dateTo, fn ($q) =>
-                    $q->whereDate('expected_close_date', '<=', $this->dateTo)
+                        $q->whereDate('expected_close_date', '<=', $this->dateTo)
                     )
                     ->orderByDesc('value')
                     ->limit(100),
@@ -151,15 +188,12 @@ class Board extends Component
 
         $clients = Client::orderBy('name')->limit(500)->get(['id', 'name']);
 
-        $closedIds = OpportunityStage::whereIn('name', ['Fechado - Ganho', 'Fechado - Perdido'])
-            ->pluck('id');
-
         $totalEstimated = $stages
             ->flatMap->opportunities
             ->filter(fn ($opp) => ! $closedIds->contains($opp->stage_id))
             ->sum('value');
 
-        return view('livewire.opportunities.board', compact('stages', 'clients', 'totalEstimated'))
+        return view('livewire.opportunities.board', compact('stages', 'clients', 'totalEstimated', 'allStages'))
             ->layout('layouts.app', ['title' => 'Pipeline de Oportunidades']);
     }
 
@@ -184,6 +218,12 @@ class Board extends Component
 
     public function clearFilters(): void
     {
+        $this->search = '';
+        $this->clientFilter = '';
+        $this->stageFilter = '';
+        $this->statusFilter = '';
+        $this->valueMin = '';
+        $this->valueMax = '';
         $this->dateFrom = '';
         $this->dateTo   = '';
         $this->dispatch('filters-cleared');

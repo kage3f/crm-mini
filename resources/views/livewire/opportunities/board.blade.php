@@ -7,33 +7,13 @@
             </p>
         </div>
 
-            <div class="flex items-center gap-2">
-                {{-- De --}}
-                <div class="flex flex-col bg-white border border-slate-200 rounded-lg px-3 py-1.5 shadow-xs cursor-pointer hover:border-slate-300 transition-colors min-w-[120px]">
-                    <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">De</span>
-                    <input id="picker-from" readonly placeholder="dd/mm/aaaa"
-                           class="text-xs text-slate-700 border-none outline-none bg-transparent cursor-pointer w-full" />
-                </div>
-
-                <svg class="w-3.5 h-3.5 text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+        <div class="flex items-center gap-2">
+            <button wire:click="$toggle('showFilters')" class="btn-secondary flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L14 13.414V19a1 1 0 01-1.447.894l-2-1A1 1 0 0110 18v-4.586L3.293 6.707A1 1 0 013 6V4z" />
                 </svg>
-
-                {{-- Até --}}
-                <div class="flex flex-col bg-white border border-slate-200 rounded-lg px-3 py-1.5 shadow-xs cursor-pointer hover:border-slate-300 transition-colors min-w-[120px]">
-                    <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Até</span>
-                    <input id="picker-to" readonly placeholder="dd/mm/aaaa"
-                           class="text-xs text-slate-700 border-none outline-none bg-transparent cursor-pointer w-full" />
-                </div>
-
-                @if($dateFrom || $dateTo)
-                    <button wire:click="clearFilters" class="text-slate-300 hover:text-red-400 transition-colors" title="Limpar filtro">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                @endif
-            </div>
+                <span class="text-xs">Filtros</span>
+            </button>
 
             {{-- Botão refresh manual --}}
             <button wire:click="refresh" wire:loading.attr="disabled"
@@ -54,7 +34,84 @@
                     Nova Oportunidade
                 </button>
             @endcan
+        </div>
     </div>
+
+    @if($showFilters)
+        <div class="bg-white border border-slate-200 rounded-xl p-4 mb-6 shadow-xs">
+            <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+                <div class="md:col-span-2">
+                    <label class="label">Buscar</label>
+                    <input wire:model.live.debounce.300ms="search" type="text" class="input" placeholder="Título da oportunidade">
+                </div>
+
+                <div>
+                    <label class="label">Cliente</label>
+                    <select wire:model.live="clientFilter" class="input">
+                        <option value="">Todos</option>
+                        @foreach($clients as $client)
+                            <option value="{{ $client->id }}">{{ $client->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="label">Estágio</label>
+                    <select wire:model.live="stageFilter" class="input">
+                        <option value="">Todos</option>
+                        @foreach($allStages as $stage)
+                            <option value="{{ $stage->id }}">{{ $stage->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="label">Status</label>
+                    <select wire:model.live="statusFilter" class="input">
+                        <option value="">Todos</option>
+                        <option value="open">Em aberto</option>
+                        <option value="closed">Fechadas</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="label">Valor (mín)</label>
+                    <input wire:model.live="valueMin" type="number" step="0.01" class="input" placeholder="0,00">
+                </div>
+
+                <div>
+                    <label class="label">Valor (máx)</label>
+                    <input wire:model.live="valueMax" type="number" step="0.01" class="input" placeholder="10000,00">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="label">Período (previsão)</label>
+                    <div class="flex items-center gap-2">
+                        <div class="flex flex-col bg-white border border-slate-200 rounded-lg px-3 py-1.5 shadow-xs cursor-pointer hover:border-slate-300 transition-colors min-w-[120px]">
+                            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">De</span>
+                            <input id="picker-from" readonly placeholder="dd/mm/aaaa"
+                                class="text-xs text-slate-700 border-none outline-none bg-transparent cursor-pointer w-full" />
+                        </div>
+
+                        <svg class="w-3.5 h-3.5 text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+
+                        <div class="flex flex-col bg-white border border-slate-200 rounded-lg px-3 py-1.5 shadow-xs cursor-pointer hover:border-slate-300 transition-colors min-w-[120px]">
+                            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Até</span>
+                            <input id="picker-to" readonly placeholder="dd/mm/aaaa"
+                                class="text-xs text-slate-700 border-none outline-none bg-transparent cursor-pointer w-full" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-6 flex items-center justify-end gap-2 pt-1">
+                    <button wire:click="clearFilters" class="btn-secondary">Limpar filtros</button>
+                    <button wire:click="$toggle('showFilters')" class="btn-primary">Fechar</button>
+                </div>
+            </div>
+        </div>
+    @endif
 
     @if(!$showModal)
         <div wire:poll.60s="refresh"></div>
@@ -151,7 +208,7 @@
                     <div>
                         <label class="label">Estágio *</label>
                         <select wire:model="stage_id" class="input">
-                            @foreach($stages as $stage)
+                            @foreach($allStages as $stage)
                             <option value="{{ $stage->id }}">{{ $stage->name }}</option>
                             @endforeach
                         </select>
@@ -238,26 +295,41 @@
                 return `${y}-${m}-${d}`;
             }
 
-            const fpFrom = flatpickr('#picker-from', {
-                ...fpConfig,
-                defaultDate: isoToLocal($wire.dateFrom),
-                onChange([date]) {
-                    $wire.set('dateFrom', dateToIso(date));
-                },
-            });
+            let fpFrom = null;
+            let fpTo = null;
 
-            const fpTo = flatpickr('#picker-to', {
-                ...fpConfig,
-                defaultDate: isoToLocal($wire.dateTo),
-                onChange([date]) {
-                    $wire.set('dateTo', dateToIso(date));
-                },
-            });
+            function initPickers() {
+                const fromEl = document.getElementById('picker-from');
+                const toEl = document.getElementById('picker-to');
+
+                if (!fromEl || !toEl) return;
+
+                if (fpFrom) fpFrom.destroy();
+                if (fpTo) fpTo.destroy();
+
+                fpFrom = flatpickr(fromEl, {
+                    ...fpConfig,
+                    defaultDate: isoToLocal($wire.dateFrom),
+                    onChange([date]) {
+                        $wire.set('dateFrom', dateToIso(date));
+                    },
+                });
+
+                fpTo = flatpickr(toEl, {
+                    ...fpConfig,
+                    defaultDate: isoToLocal($wire.dateTo),
+                    onChange([date]) {
+                        $wire.set('dateTo', dateToIso(date));
+                    },
+                });
+            }
 
             // Watch é mais confiável que evento para sincronizar limpeza
-            $wire.watch('dateFrom', value => { if (!value) fpFrom.clear(); });
-            $wire.watch('dateTo',   value => { if (!value) fpTo.clear(); });
+            $wire.watch('dateFrom', value => { if (!value && fpFrom) fpFrom.clear(); });
+            $wire.watch('dateTo',   value => { if (!value && fpTo) fpTo.clear(); });
+            $wire.watch('showFilters', value => { if (value) setTimeout(initPickers, 0); });
 
+            initPickers();
             initSortable();
 
             $wire.on('kanban-refreshed', initSortable);
