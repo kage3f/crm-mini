@@ -94,7 +94,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/profile', Profile::class)->name('profile');
         Route::get('/security', Security::class)->name('security');
         Route::get('/company', Company::class)->name('company');
-        Route::get('/team', Team::class)->name('team');
+        Route::get('/team', Team::class)
+            ->middleware('role_or_permission:admin|manage-team')
+            ->name('team');
         Route::get('/permissions', Permissions::class)
             ->middleware('role_or_permission:admin|manage-permissions')
             ->name('permissions');
