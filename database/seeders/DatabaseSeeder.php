@@ -2,9 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Company;
-use App\Models\OpportunityStage;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -18,6 +15,9 @@ class DatabaseSeeder extends Seeder
     {
         // 1. Roles & Permissions (Global)
         $this->seedRolesAndPermissions();
+
+        // 2. Default opportunity stages for all companies
+        $this->call(CompanyDefaultStagesSeeder::class);
     }
 
     private function seedRolesAndPermissions(): void

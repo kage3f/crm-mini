@@ -51,4 +51,24 @@ class Task extends Model
     {
         return $this->due_date && $this->due_date->isPast() && $this->status !== 'done';
     }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return match ($this->status) {
+            'pending' => 'Pendente',
+            'in_progress' => 'Em andamento',
+            'done' => 'Concluida',
+            default => ucfirst((string) $this->status),
+        };
+    }
+
+    public function getStatusColorAttribute(): string
+    {
+        return match ($this->status) {
+            'pending' => 'badge-yellow',
+            'in_progress' => 'badge-blue',
+            'done' => 'badge-green',
+            default => 'badge-gray',
+        };
+    }
 }

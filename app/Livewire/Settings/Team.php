@@ -36,7 +36,8 @@ class Team extends Component
 
     public function removeMember(int $userId): void
     {
-        $this->authorize('admin');
+        abort_unless(auth()->user()?->hasRole('admin'), 403);
+
         User::where('id', $userId)
             ->where('company_id', auth()->user()->company_id)
             ->where('id', '!=', auth()->id())
