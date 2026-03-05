@@ -25,7 +25,7 @@ class Login extends Component
             return;
         }
 
-        request()->session()->regenerate();
+        session()->regenerate();
 
         return redirect()->intended(route('dashboard'));
     }
