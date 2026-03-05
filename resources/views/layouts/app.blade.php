@@ -14,9 +14,9 @@
     @livewireStyles
 </head>
 
-<body class="h-full bg-slate-50 font-sans">
+<body class="h-full bg-slate-50 font-sans overflow-x-hidden {{ request()->routeIs('opportunities.*') ? 'overflow-hidden' : '' }}">
 
-    <div class="flex flex-col min-h-screen">
+    <div class="flex flex-col {{ request()->routeIs('opportunities.*') ? 'h-screen overflow-hidden' : 'min-h-screen' }}">
         {{-- Top Navbar --}}
         <header class="w-full h-16 bg-brand-600 border-b border-brand-700/30 sticky top-0 z-40">
             <div class="h-full flex items-center justify-between px-6">
@@ -79,7 +79,7 @@
                         <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
                         </svg>
-                        Pipeline
+                        Funil de Vendas
                     </a>
                 @endcan
 
@@ -111,7 +111,7 @@
         </aside>
 
         {{-- Main content --}}
-        <div class="flex-1 ml-64 flex flex-col min-h-screen min-w-0">
+        <div class="flex-1 pl-64 flex flex-col min-h-0 min-w-0 {{ request()->routeIs('opportunities.*') ? 'h-[calc(100vh-4rem)] overflow-hidden' : '' }}">
             {{-- Top bar --}}
             <header class="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between sticky top-0 z-20">
                 <h1 class="text-lg font-semibold text-slate-800">{{ $title ?? 'MiniCRM' }}</h1>
@@ -133,7 +133,7 @@
             </header>
 
             {{-- Page content --}}
-            <main class="flex-1 p-6 min-w-0 overflow-x-hidden">
+            <main class="flex-1 min-h-0 min-w-0 overflow-x-hidden {{ request()->routeIs('opportunities.*') ? 'p-0 overflow-hidden' : 'p-6' }}">
                 {{ $slot }}
             </main>
         </div>

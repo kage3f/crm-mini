@@ -194,7 +194,7 @@ class Board extends Component
             ->sum('value');
 
         return view('livewire.opportunities.board', compact('stages', 'clients', 'totalEstimated', 'allStages'))
-            ->layout('layouts.app', ['title' => 'Pipeline de Oportunidades']);
+            ->layout('layouts.app', ['title' => 'Funil de Vendas']);
     }
 
     // -------------------------------------------------------------------------

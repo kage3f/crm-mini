@@ -20,7 +20,7 @@ class Permissions extends Component
                 'clients.update' => 'Editar clientes',
                 'clients.delete' => 'Excluir clientes',
             ],
-            'Pipeline' => [
+            'Funil de Vendas' => [
                 'opportunities.view' => 'Ver oportunidades',
                 'opportunities.create' => 'Criar oportunidades',
                 'opportunities.update' => 'Editar/mover oportunidades',
