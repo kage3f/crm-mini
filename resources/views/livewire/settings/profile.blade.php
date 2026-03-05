@@ -46,11 +46,14 @@
                 </div>
                 <form wire:submit.prevent="save" class="p-6 space-y-5">
                     <div class="flex items-center gap-6 mb-2">
-                        <img src="{{ auth()->user()->avatar }}" class="w-20 h-20 rounded-2xl ring-4 ring-slate-100">
+                        <img src="{{ $avatar ? $avatar->temporaryUrl() : auth()->user()->avatar }}" class="w-20 h-20 rounded-2xl ring-4 ring-slate-100 object-cover">
                         <div>
                             <p class="text-sm font-bold text-slate-800">{{ auth()->user()->name }}</p>
                             <p class="text-xs text-slate-400 mt-0.5">Membro desde {{ auth()->user()->created_at->format('M Y') }}</p>
-                            <button type="button" class="btn-ghost btn-sm -ml-2 text-brand-600 mt-1 opacity-50 cursor-not-allowed">Alterar foto (em breve)</button>
+                            <label for="avatar-upload" class="btn-ghost btn-sm -ml-2 text-brand-600 mt-1 cursor-pointer">Alterar foto</label>
+                            <input id="avatar-upload" type="file" wire:model="avatar" accept="image/jpeg,image/png,image/webp" class="hidden">
+                            <p class="text-xs text-slate-400 mt-1">JPG, PNG ou WEBP (max 2MB)</p>
+                            @error('avatar') <p class="field-error">{{ $message }}</p> @enderror
                         </div>
                     </div>
 

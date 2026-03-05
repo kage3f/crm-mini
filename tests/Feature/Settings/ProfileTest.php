@@ -6,6 +6,8 @@ use App\Livewire\Settings\Profile;
 use App\Models\User;
 use Database\Seeders\PermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -84,5 +86,26 @@ class ProfileTest extends TestCase
             ->set('email', $existing->email)
             ->call('save')
             ->assertHasErrors(['email']);
+    }
+
+    public function test_user_can_upload_avatar(): void
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->create();
+
+        $this->actingAs($user);
+
+        Livewire::test(Profile::class)
+            ->set('name', $user->name)
+            ->set('email', $user->email)
+            ->set('avatar', UploadedFile::fake()->image('avatar.jpg'))
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $user->refresh();
+
+        $this->assertNotNull($user->avatar_url);
+        Storage::disk('public')->assertExists($user->avatar_url);
     }
 }
