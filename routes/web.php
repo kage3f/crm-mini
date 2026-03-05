@@ -14,6 +14,7 @@ use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\Security;
 use App\Livewire\Settings\Company;
 use App\Livewire\Settings\Team;
+use App\Livewire\Settings\Permissions;
 use App\Http\Controllers\InvitationController;
 use Illuminate\Support\Facades\Route;
 
@@ -78,14 +79,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
     // Clients
-    Route::get('/clients', ClientsIndex::class)->name('clients.index');
-    Route::get('/clients/{client}', ClientShow::class)->name('clients.show');
+    Route::get('/clients', ClientsIndex::class)->middleware('role_or_permission:admin|clients.view')->name('clients.index');
+    Route::get('/clients/{client}', ClientShow::class)->middleware('role_or_permission:admin|clients.view')->name('clients.show');
 
     // Opportunities (Kanban)
-    Route::get('/opportunities', KanbanBoard::class)->name('opportunities.index');
+    Route::get('/opportunities', KanbanBoard::class)->middleware('role_or_permission:admin|opportunities.view')->name('opportunities.index');
 
     // Tasks
-    Route::get('/tasks', TasksIndex::class)->name('tasks.index');
+    Route::get('/tasks', TasksIndex::class)->middleware('role_or_permission:admin|tasks.view')->name('tasks.index');
 
 
     // Settings
@@ -94,5 +95,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/security', Security::class)->name('security');
         Route::get('/company', Company::class)->name('company');
         Route::get('/team', Team::class)->name('team');
+        Route::get('/permissions', Permissions::class)
+            ->middleware('role_or_permission:admin|manage-permissions')
+            ->name('permissions');
     });
 });

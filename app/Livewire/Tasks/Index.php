@@ -53,6 +53,7 @@ class Index extends Component
 
     public function openCreateModal(): void
     {
+        abort_unless(auth()->user()?->can('tasks.create'), 403);
         $this->resetForm();
         $this->showModal = true;
         $this->isEditing = false;
@@ -60,6 +61,7 @@ class Index extends Component
 
     public function openEditModal(int $id): void
     {
+        abort_unless(auth()->user()?->can('tasks.update'), 403);
         $task = Task::findOrFail($id);
         $this->editingId      = $id;
         $this->title          = $task->title;
@@ -75,6 +77,10 @@ class Index extends Component
 
     public function save(): void
     {
+        $this->isEditing
+            ? abort_unless(auth()->user()?->can('tasks.update'), 403)
+            : abort_unless(auth()->user()?->can('tasks.create'), 403);
+
         $this->validate();
 
         $data = [
@@ -82,7 +88,7 @@ class Index extends Component
             'description'    => $this->description ?: null,
             'client_id'      => $this->client_id ?: null,
             'opportunity_id' => $this->opportunity_id ?: null,
-            'assigned_to'    => $this->assigned_to ?: null,
+            'assigned_to'    => auth()->user()?->can('tasks.assign') ? ($this->assigned_to ?: null) : null,
             'status'         => $this->status,
             'due_date'       => $this->due_date ?: null,
             'created_by'     => auth()->id(),
@@ -101,12 +107,14 @@ class Index extends Component
 
     public function markDone(int $id): void
     {
+        abort_unless(auth()->user()?->can('tasks.update'), 403);
         Task::findOrFail($id)->update(['status' => 'done']);
         session()->flash('success', 'Tarefa marcada como concluída!');
     }
 
     public function delete(int $id): void
     {
+        abort_unless(auth()->user()?->can('tasks.delete'), 403);
         Task::findOrFail($id)->delete();
         session()->flash('success', 'Tarefa removida.');
     }
@@ -127,6 +135,8 @@ class Index extends Component
 
     public function render()
     {
+        abort_unless(auth()->user()?->can('tasks.view'), 403);
+
         $tasks = Task::query()
             ->with(['client', 'opportunity'])
             ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))

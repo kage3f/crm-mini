@@ -11,6 +11,7 @@ class Show extends Component
 
     public function mount(Client $client)
     {
+        abort_unless(auth()->user()?->can('clients.view'), 403);
         $this->client = $client;
     }
 

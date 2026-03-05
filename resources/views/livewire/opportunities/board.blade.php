@@ -46,12 +46,14 @@
                 <span class="text-xs">Atualizar</span>
             </button>
 
-            <button wire:click="openCreateModal" class="btn-primary">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-                Nova Oportunidade
-            </button>
+            @can('opportunities.create')
+                <button wire:click="openCreateModal" class="btn-primary">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Nova Oportunidade
+                </button>
+            @endcan
     </div>
 
     @if(!$showModal)
@@ -75,7 +77,11 @@
 
                 <div class="flex-1 space-y-3 kanban-list" data-stage="{{ $stage->id }}" id="stage-{{ $stage->id }}">
                     @foreach($stage->opportunities as $opp)
+                    @can('opportunities.update')
                     <div class="kanban-card group relative" data-id="{{ $opp->id }}" wire:click="openEditModal({{ $opp->id }})">
+                    @else
+                    <div class="kanban-card group relative" data-id="{{ $opp->id }}">
+                    @endcan
                         <div class="mb-2">
                             <h5 class="font-bold text-slate-900 text-sm group-hover:text-brand-600 transition-colors">{{ $opp->title }}</h5>
                             @if($opp->client)
@@ -100,12 +106,14 @@
                     <div class="h-12 pointer-events-none"></div>
                 </div>
 
-                <button wire:click="openCreateModal({{ $stage->id }})" class="mt-4 w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-slate-400 text-xs font-bold hover:border-slate-300 hover:text-slate-500 transition-all flex items-center justify-center gap-1">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Adicionar
-                </button>
+                @can('opportunities.create')
+                    <button wire:click="openCreateModal({{ $stage->id }})" class="mt-4 w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-slate-400 text-xs font-bold hover:border-slate-300 hover:text-slate-500 transition-all flex items-center justify-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Adicionar
+                    </button>
+                @endcan
             </div>
             @endforeach
         </div>
@@ -169,9 +177,13 @@
 
                 <div class="pt-4 flex items-center justify-between">
                     @if($isEditing)
-                    <button type="button" wire:click="delete({{ $editingId }})" wire:confirm="Excluir esta oportunidade?" class="btn-ghost text-red-600">Excluir</button>
+                        @can('opportunities.delete')
+                            <button type="button" wire:click="delete({{ $editingId }})" wire:confirm="Excluir esta oportunidade?" class="btn-ghost text-red-600">Excluir</button>
+                        @else
+                            <div></div>
+                        @endcan
                     @else
-                    <div></div>
+                        <div></div>
                     @endif
                     <div class="flex items-center gap-3">
                         <button type="button" wire:click="closeModal" class="btn-secondary">Cancelar</button>

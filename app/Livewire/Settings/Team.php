@@ -19,6 +19,7 @@ class Team extends Component
 
     public function invite(InviteTeamMemberAction $action): void
     {
+        abort_unless(auth()->user()?->can('manage-team'), 403);
         $this->validate();
 
         $companyId = auth()->user()->company_id;
@@ -36,6 +37,7 @@ class Team extends Component
 
     public function removeMember(int $userId): void
     {
+        abort_unless(auth()->user()?->can('manage-team'), 403);
         abort_unless(auth()->user()?->hasRole('admin'), 403);
 
         User::where('id', $userId)
@@ -47,6 +49,7 @@ class Team extends Component
 
     public function cancelInvitation(int $id): void
     {
+        abort_unless(auth()->user()?->can('manage-team'), 403);
         TeamInvitation::where('id', $id)
             ->where('company_id', auth()->user()->company_id)
             ->delete();

@@ -50,6 +50,7 @@ class Index extends Component
 
     public function openCreateModal(): void
     {
+        abort_unless(auth()->user()?->can('clients.create'), 403);
         $this->resetForm();
         $this->isEditing = false;
         $this->showModal = true;
@@ -57,6 +58,7 @@ class Index extends Component
 
     public function openEditModal(int $id): void
     {
+        abort_unless(auth()->user()?->can('clients.update'), 403);
         $client = Client::findOrFail($id);
         $this->editingId = $id;
         $this->name      = $client->name;
@@ -71,6 +73,10 @@ class Index extends Component
 
     public function save(CreateClientAction $createAction, UpdateClientAction $updateAction): void
     {
+        $this->isEditing
+            ? abort_unless(auth()->user()?->can('clients.update'), 403)
+            : abort_unless(auth()->user()?->can('clients.create'), 403);
+
         $this->validate();
 
         $data = [
@@ -95,6 +101,7 @@ class Index extends Component
 
     public function delete(int $id): void
     {
+        abort_unless(auth()->user()?->can('clients.delete'), 403);
         Client::findOrFail($id)->delete();
         session()->flash('success', 'Cliente removido.');
     }
@@ -115,6 +122,8 @@ class Index extends Component
 
     public function render()
     {
+        abort_unless(auth()->user()?->can('clients.view'), 403);
+
         $clients = Client::query()
             ->when($this->search, fn($q) => $q->where(function ($q) {
                 $q->where('name', 'like', "%{$this->search}%")

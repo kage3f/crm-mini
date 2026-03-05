@@ -27,6 +27,14 @@
                     </svg>
                     Equipe
                 </a>
+                @can('manage-permissions')
+                    <a href="{{ route('settings.permissions') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('settings.permissions') ? 'bg-white text-brand-600 shadow-sm' : 'text-slate-600 hover:bg-slate-100' }}">
+                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5-1a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Permissões
+                    </a>
+                @endcan
             </nav>
         </div>
 

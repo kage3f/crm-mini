@@ -25,12 +25,14 @@
             </select>
         </div>
 
-        <button wire:click="openCreateModal" class="btn-primary">
-            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Nova Tarefa
-        </button>
+        @can('tasks.create')
+            <button wire:click="openCreateModal" class="btn-primary">
+                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Nova Tarefa
+            </button>
+        @endcan
     </div>
 
     {{-- Overdue Alert --}}
@@ -50,6 +52,7 @@
             <div class="p-5 flex items-center gap-4 hover:bg-slate-50 transition-colors group">
                 {{-- Checkbox --}}
                 <div class="shrink-0">
+                    @can('tasks.update')
                     <button wire:click="markDone({{ $task->id }})"
                         class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all 
                                 {{ $task->status === 'done' ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 hover:border-brand-500' }}"
@@ -60,6 +63,7 @@
                         </svg>
                         @endif
                     </button>
+                    @endcan
                 </div>
 
                 {{-- Info --}}
@@ -102,16 +106,20 @@
 
                 {{-- Actions --}}
                 <div class="shrink-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button wire:click="openEditModal({{ $task->id }})" class="p-2 text-slate-400 hover:text-brand-600 transition-colors">
-                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                    </button>
-                    <button wire:click="delete({{ $task->id }})" wire:confirm="Excluir esta tarefa?" class="p-2 text-slate-400 hover:text-red-600 transition-colors">
-                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
+                    @can('tasks.update')
+                        <button wire:click="openEditModal({{ $task->id }})" class="p-2 text-slate-400 hover:text-brand-600 transition-colors">
+                            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                        </button>
+                    @endcan
+                    @can('tasks.delete')
+                        <button wire:click="delete({{ $task->id }})" wire:confirm="Excluir esta tarefa?" class="p-2 text-slate-400 hover:text-red-600 transition-colors">
+                            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    @endcan
                 </div>
             </div>
             @empty
@@ -188,15 +196,17 @@
                     </div>
                 </div>
 
-                <div>
-                    <label class="label">Responsável</label>
-                    <select wire:model="assigned_to" class="input">
-                        <option value="">Ninguém (sem atribuição)</option>
-                        @foreach($teamMembers as $member)
-                        <option value="{{ $member->id }}">{{ $member->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
+                @can('tasks.assign')
+                    <div>
+                        <label class="label">Responsável</label>
+                        <select wire:model="assigned_to" class="input">
+                            <option value="">Ninguém (sem atribuição)</option>
+                            @foreach($teamMembers as $member)
+                            <option value="{{ $member->id }}">{{ $member->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endcan
 
                 <div>
                     <label class="label">Descrição / Notas</label>

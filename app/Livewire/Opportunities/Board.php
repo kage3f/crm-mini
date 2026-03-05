@@ -49,6 +49,7 @@ class Board extends Component
 
     public function move(int $opportunityId, int $stageId, MoveOpportunityAction $action): void
     {
+        abort_unless(auth()->user()?->can('opportunities.update'), 403);
         $opportunity = Opportunity::findOrFail($opportunityId);
         $this->authorize('update', $opportunity);
         $action->execute($opportunity, $stageId);
@@ -56,6 +57,10 @@ class Board extends Component
 
     public function save(SaveOpportunityAction $action): void
     {
+        $this->isEditing
+            ? abort_unless(auth()->user()?->can('opportunities.update'), 403)
+            : abort_unless(auth()->user()?->can('opportunities.create'), 403);
+
         $this->isEditing
             ? $this->authorize('update', Opportunity::findOrFail($this->editingId))
             : $this->authorize('create', Opportunity::class);
@@ -81,6 +86,7 @@ class Board extends Component
 
     public function delete(int $id, DeleteOpportunityAction $action): void
     {
+        abort_unless(auth()->user()?->can('opportunities.delete'), 403);
         $opportunity = Opportunity::findOrFail($id);
         $this->authorize('delete', $opportunity);
 
@@ -90,6 +96,7 @@ class Board extends Component
 
     public function openCreateModal(?int $stageId = null): void
     {
+        abort_unless(auth()->user()?->can('opportunities.create'), 403);
         $this->authorize('create', Opportunity::class);
 
         $this->resetForm();
@@ -100,6 +107,7 @@ class Board extends Component
 
     public function openEditModal(int $id): void
     {
+        abort_unless(auth()->user()?->can('opportunities.update'), 403);
         $opp = Opportunity::findOrFail($id);
         $this->authorize('update', $opp);
 
@@ -122,6 +130,7 @@ class Board extends Component
 
     public function render()
     {
+        abort_unless(auth()->user()?->can('opportunities.view'), 403);
         $this->authorize('viewAny', Opportunity::class);
 
         $stages = OpportunityStage::orderBy('order')
