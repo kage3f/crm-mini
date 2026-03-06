@@ -269,4 +269,31 @@ class ClientsTest extends TestCase
             ->assertDontSee('Alice Teste');
     }
 
+    public function test_clear_filters_restores_default_listing(): void
+    {
+        $user = $this->createUserWithPermissions(['clients.view']);
+
+        Client::factory()->create([
+            'company_id' => $user->company_id,
+            'name' => 'Alice Teste',
+            'status' => 'lead',
+        ]);
+        Client::factory()->create([
+            'company_id' => $user->company_id,
+            'name' => 'Bruno Cliente',
+            'status' => 'client',
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(ClientsIndex::class)
+            ->set('search', 'Alice')
+            ->set('statusFilter', 'lead')
+            ->assertSee('Alice Teste')
+            ->assertDontSee('Bruno Cliente')
+            ->call('clearFilters')
+            ->assertSee('Alice Teste')
+            ->assertSee('Bruno Cliente');
+    }
+
 }

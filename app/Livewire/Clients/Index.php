@@ -112,6 +112,13 @@ class Index extends Component
         $this->resetForm();
     }
 
+    public function clearFilters(): void
+    {
+        $this->search = '';
+        $this->statusFilter = '';
+        $this->resetPage();
+    }
+
     private function resetForm(): void
     {
         $this->name = $this->email = $this->phone = $this->company = $this->notes = '';

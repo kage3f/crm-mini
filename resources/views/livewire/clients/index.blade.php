@@ -15,6 +15,11 @@
                 <option value="client">Cliente</option>
                 <option value="inactive">Inativo</option>
             </select>
+            @if($search !== '' || $statusFilter !== '')
+                <button wire:click="clearFilters" class="btn-secondary text-xs">
+                    Limpar filtros
+                </button>
+            @endif
         </div>
         @can('clients.create')
             <button wire:click="openCreateModal" class="btn-primary">
