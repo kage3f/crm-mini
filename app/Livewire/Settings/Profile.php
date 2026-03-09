@@ -20,12 +20,6 @@ class Profile extends Component
         $this->email = auth()->user()->email;
     }
 
-    protected array $rules = [
-        'name'  => 'required|string|min:2|max:255',
-        'email' => 'required|email|unique:users,email,' . 0, // will be overridden
-        'avatar' => 'nullable|image|max:2048|mimes:jpg,jpeg,png,webp',
-    ];
-
     protected function rules(): array
     {
         return [

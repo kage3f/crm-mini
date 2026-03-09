@@ -11,29 +11,18 @@ use Database\Seeders\PermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Livewire\Livewire;
+use Tests\Concerns\CreatesUsersWithPermissions;
 use Tests\TestCase;
 
 class PipelineTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesUsersWithPermissions;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->seed(PermissionsSeeder::class);
-    }
-
-    private function createUserWithPermissions(array $permissions = []): User
-    {
-        $user = User::factory()->create();
-        $user->assignRole('member');
-
-        if (!empty($permissions)) {
-            $user->givePermissionTo($permissions);
-        }
-
-        return $user;
     }
 
     private function createStagesForCompany(int $companyId): array

@@ -9,29 +9,18 @@ use Database\Seeders\PermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
+use Tests\Concerns\CreatesUsersWithPermissions;
 use Tests\TestCase;
 
 class ClientsTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesUsersWithPermissions;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->seed(PermissionsSeeder::class);
-    }
-
-    private function createUserWithPermissions(array $permissions = []): User
-    {
-        $user = User::factory()->create();
-        $user->assignRole('member');
-
-        if (!empty($permissions)) {
-            $user->givePermissionTo($permissions);
-        }
-
-        return $user;
     }
 
     public function test_guest_is_redirected_from_clients_page(): void
